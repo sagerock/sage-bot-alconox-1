@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { marked } from 'marked';
-import './Chatbot.css'; // Import the CSS file
+import './Chatbot.css';
+
+const LoadingSpinner = () => (
+  <div className="loading-spinner">
+    <div className="spinner"></div>
+  </div>
+);
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
     if (input.trim() === '') return;
     const userMessage = { sender: 'user', text: input };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
-
+    setLoading(true); // Set loading to true before making the API request
     try {
       const response = await axios.post(
         'https://flowiseai-railway-production-a00a.up.railway.app/api/v1/prediction/40213ceb-cd29-4483-8d98-bf77e70ac95a',
@@ -23,6 +30,7 @@ const Chatbot = () => {
     } catch (error) {
       console.error('Error sending message:', error);
     }
+    setLoading(false); // Set loading back to false after receiving the response
     setInput('');
   };
 
@@ -49,6 +57,7 @@ const Chatbot = () => {
           </div>
         ))}
       </div>
+      {loading && <LoadingSpinner />}
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
